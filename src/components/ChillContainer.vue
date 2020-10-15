@@ -10,8 +10,14 @@
     <div v-else-if="size === 'M'" class="chill__container__meduim">
       <span id="container__title">{{ title }}</span>
     </div>
-    <div v-else class="chill__container__large">
-      <span id="container__title">{{ title }}</span>
+    <div
+      v-else
+      id="chill__container__large"
+      :class="{ green: time === 'Approved' }"
+      @click="emitClickEvent(title)"
+    >
+      <span id="container__title__large">{{ title }}</span>
+      <span id="container__timer">{{ prefix + time }}</span>
     </div>
   </div>
 </template>
@@ -28,6 +34,39 @@ export default {
       type: String,
       required: true,
     },
+    timer: {
+      type: Number,
+      required: false,
+    },
+  },
+  data: () => ({
+    time: "",
+    prefix: "Auto approve in: ",
+  }),
+  mounted() {
+    let minute = Number(this.timer) - 1;
+    let sec = 10;
+    this.time =
+      (String(minute).length === 1 ? "0" + minute : minute) +
+      ":" +
+      (String(sec).length === 1 ? "0" + sec : sec);
+    const timers = setInterval(() => {
+      sec--;
+      this.time =
+        (String(minute).length === 1 ? "0" + minute : minute) +
+        ":" +
+        (String(sec).length === 1 ? "0" + sec : sec);
+      if (sec === 0 && minute !== 0) {
+        minute--;
+        sec = 59;
+      }
+      if (minute === 0 && sec === 0) {
+        this.time = "Approved";
+        this.prefix = "";
+        clearInterval(timers);
+        this.$emit("approved");
+      }
+    }, 1000);
   },
   methods: {
     emitClickEvent(title) {
@@ -56,11 +95,11 @@ export default {
   opacity: 0.4;
 }
 
-.chill__container__large:hover {
+#chill__container__large:hover {
   background: rgb(208, 207, 245);
 }
 
-.chill__container__large:active {
+#chill__container__large:active {
   border: 2px solid #555;
   opacity: 0.4;
 }
@@ -83,7 +122,7 @@ export default {
 .chill__container__meduim {
   border: 0.2px solid rgb(247, 244, 244);
   width: 500px;
-  height: 70px;
+  height: 60px;
   margin: 8px 8px 8px 0px;
   background: white;
   display: flex;
@@ -94,10 +133,10 @@ export default {
   position: relative;
 }
 
-.chill__container__large {
+#chill__container__large {
   border: 0.2px solid rgb(247, 244, 244);
   width: 700px;
-  height: 80px;
+  height: 60px;
   margin: 8px 8px 8px 0px;
   background: white;
   display: flex;
@@ -114,5 +153,27 @@ export default {
   flex-direction: column;
   margin-top: 16px;
   font-size: 20px;
+}
+
+#container__title__large {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+  margin-left: 8px;
+  font-size: 14px;
+}
+
+#container__timer {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  margin-top: -14px;
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.green {
+  background: rgb(161, 243, 161) !important;
 }
 </style>

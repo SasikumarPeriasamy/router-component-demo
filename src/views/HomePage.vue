@@ -10,7 +10,7 @@
   <div id="home__title">
     <h3>Hi {{ data.userName }}</h3>
   </div>
-  <div class="home__content">
+  <div class="home__content" v-if="data.userRegister">
     <div class="home_content__tiles" v-for="tile in data.tiles" :key="tile.id">
       <chill-container
         size="S"
@@ -18,6 +18,17 @@
         @title-action="routeToPage"
       ></chill-container>
     </div>
+  </div>
+  <div class="home_content__redirect" v-else>
+    <span id="hint__content"
+      >You haven't registered in our site yet. Kindly Register and try
+      again..</span
+    >
+    <chill-container
+      size="S"
+      title="Register"
+      @title-action="routeToRegisterPage"
+    ></chill-container>
   </div>
   <div class="home_container__response">
     <div v-if="data.selectedContainer === 3">
@@ -27,18 +38,21 @@
 </template>
 
 <script>
-import { reactive } from "vue";
+import { onMounted, reactive } from "vue";
 import { useRoute } from "vue-router";
 import ChillContainer from "./../components/ChillContainer.vue";
+import { useStore } from "vuex";
+import router from "./../router/router";
+
 export default {
   components: {
     ChillContainer,
   },
   setup() {
-    const router = useRoute();
-    const user = router.params.user;
-    const initialletter = user.charAt(0).toUpperCase();
-    const userName = initialletter + user.slice(1, user.length);
+    const route = useRoute();
+    const store = useStore();
+    const user = route.params.user;
+    const userName = "";
     const selectedContainer = 0;
     const tiles = [
       { id: 0, title: "Translate" },
@@ -51,6 +65,7 @@ export default {
       userName: userName,
       tiles: tiles,
       selectedContainer,
+      userRegister: false,
     });
 
     function routeToPage(title) {
@@ -59,7 +74,28 @@ export default {
         .map((tile) => tile.id)[0];
     }
 
-    return { data, routeToPage };
+    onMounted(() => {
+      const activeUser = store.state.user;
+      const availableUser = store.state.userDetails;
+      const userDetails = availableUser.filter(
+        (user) => user.userName.toLowerCase() === activeUser.toLowerCase()
+      );
+      if (userDetails.length !== 0) {
+        data.userName =
+          userDetails[0].firstName + " " + userDetails[0].lastName;
+        data.userRegister = true;
+      } else {
+        const initialletter = user.charAt(0).toUpperCase();
+        data.userName = initialletter + user.slice(1, user.length);
+        data.userRegister = false;
+      }
+    });
+
+    function routeToRegisterPage() {
+      router.push("/register/" + data.user);
+    }
+
+    return { data, routeToPage, routeToRegisterPage };
   },
 };
 </script>
@@ -118,5 +154,16 @@ export default {
   position: relative;
   margin-top: 74px;
   margin-left: 8px;
+}
+
+.home_content__redirect {
+  display: grid;
+  float: left;
+  margin-left: 8px;
+}
+
+#hint__content {
+  font-size: 10px;
+  color: rgb(147, 92, 250);
 }
 </style>

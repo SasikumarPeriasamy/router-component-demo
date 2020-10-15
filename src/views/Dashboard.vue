@@ -12,6 +12,7 @@
 <script>
 import { reactive } from "vue";
 import { useRoute } from "vue-router";
+import { useStore } from "vuex";
 import ChillContainer from "./../components/ChillContainer.vue";
 import router from "./../router/router";
 
@@ -21,6 +22,7 @@ export default {
   },
   setup() {
     const route = useRoute();
+    const store = useStore();
     const user = route.params.user;
     const data = reactive({
       titles: [
@@ -34,12 +36,13 @@ export default {
     });
 
     function routeToPage(page) {
+      store.dispatch("setUser", data.user);
       if (data.user) {
         router.push("/" + page.toLowerCase() + "/" + data.user);
       }
     }
 
-    return { data, routeToPage };
+    return { data, routeToPage, store };
   },
 };
 </script>

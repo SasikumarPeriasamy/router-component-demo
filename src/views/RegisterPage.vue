@@ -7,18 +7,143 @@
       >Back</router-link
     >
   </div>
+  <div>
+    <span><h5>Kindly fill the below details and click "Submit"</h5></span>
+    <div class="register__content" v-if="data.userNotExist">
+      <form id="register__form" @submit.prevent>
+        <chill-input
+          type="text"
+          @value="data.firstName = $event"
+          hint="First name"
+          label="Frist Name"
+        />
+        <chill-input
+          type="text"
+          @value="data.lastName = $event"
+          hint="Last name"
+          label="Last Name"
+        />
+        <chill-input
+          type="text"
+          @value="data.gender = $event"
+          :isError="data.errorGender"
+          hint="male or female"
+          label="Gender"
+        />
+        <chill-input
+          type="text"
+          @value="data.age = $event"
+          hint=""
+          label="Age"
+        />
+        <chill-input
+          type="text"
+          @value="data.address = $event"
+          :isError="data.errorAddress"
+          hint="Plot no, city, state, pincode."
+          label="Address"
+        />
+        <chill-input
+          type="text"
+          @value="data.mob = $event"
+          :isError="data.errorMob"
+          hint="should be 10 digit"
+          label="Mobile No"
+        />
+        <chill-button
+          type="button"
+          @on-click="submit"
+          :disabled="toDisable"
+          label="Submit"
+        ></chill-button>
+      </form>
+    </div>
+    <div class="msg__registered" v-else></div>
+  </div>
 </template>
 
 <script>
 import { reactive } from "vue";
 import { useRoute } from "vue-router";
+import ChillInput from "./../components/ChillInput";
+import ChillButton from "./../components/ChillButton";
+import router from "./../router/router";
+import { useStore } from "vuex";
 export default {
+  components: {
+    ChillInput,
+    ChillButton,
+  },
   setup() {
-    const router = useRoute();
-    const user = router.params.user;
-    const data = reactive({ user });
+    const route = useRoute();
+    const store = useStore();
+    const user = route.params.user;
+    let datas = [];
+    const data = reactive({
+      user,
+      firstName: "",
+      lastName: "",
+      gender: "",
+      age: "",
+      address: "",
+      mob: "",
+      userNotExist: true,
+      errorGender: false,
+      errorAddress: false,
+      errorMob: false,
+    });
 
-    return { data };
+    function submit() {
+      let error = false;
+      if (!data.gender) {
+        data.errorGender = true;
+        error = true;
+      } else if ((data.gender !== "male") | "female") {
+        data.errorGender = true;
+        error = true;
+      } else {
+        data.errorGender = false;
+      }
+      if (data.mob && data.mob.length !== 10) {
+        data.errorMob = true;
+        error = true;
+      } else {
+        data.errorMob = false;
+      }
+      if (data.address) {
+        datas = data.address.split(",");
+        if (datas.length !== 4) {
+          data.errorAddress = true;
+          error = true;
+        } else {
+          data.errorAddress = false;
+        }
+      }
+      if (!error) {
+        const newUserDetail = {
+          userName: data.user,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          gender: data.gender,
+          age: data.age,
+          address: {
+            streetAddress: datas[0],
+            city: datas[1],
+            state: datas[2],
+            postalCode: datas[3],
+          },
+          phoneNumbers: {
+            type: "home",
+            number: data.mob,
+          },
+          registered: false,
+        };
+        store.dispatch("addUserDetail", newUserDetail);
+        router.push("/submitted/" + data.user);
+      }
+    }
+
+    return { data, submit };
   },
 };
 </script>
@@ -51,5 +176,19 @@ export default {
   display: flex;
   z-index: 1;
   margin-left: 16px;
+}
+
+.register__content {
+  display: flex;
+  margin: auto;
+  width: 50%;
+  height: 50%;
+  background-color: white;
+  margin-top: 8px;
+}
+
+#register__form {
+  margin: auto;
+  width: 50%;
 }
 </style>
