@@ -19,6 +19,11 @@
       ></chill-container>
     </div>
   </div>
+  <div class="home_container__response">
+    <div v-if="data.selectedContainer === 3">
+      <span>Check</span>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -34,14 +39,27 @@ export default {
     const user = router.params.user;
     const initialletter = user.charAt(0).toUpperCase();
     const userName = initialletter + user.slice(1, user.length);
+    const selectedContainer = 0;
     const tiles = [
       { id: 0, title: "Translate" },
       { id: 1, title: "Meaning" },
-      { id: 2, title: "Favourite Number" },
+      { id: 2, title: "Lucky Number" },
+      { id: 3, title: "Frequent Jokes" },
     ];
-    const data = reactive({ user, userName: userName, tiles: tiles });
+    const data = reactive({
+      user,
+      userName: userName,
+      tiles: tiles,
+      selectedContainer,
+    });
 
-    return { data };
+    function routeToPage(title) {
+      data.selectedContainer = tiles
+        .filter((tile) => tile.title === title)
+        .map((tile) => tile.id)[0];
+    }
+
+    return { data, routeToPage };
   },
 };
 </script>
@@ -79,6 +97,8 @@ export default {
 .home__content {
   float: left;
   margin-left: 8px;
+  position: fixed;
+  display: flex;
 }
 
 .home_content__tiles {
@@ -90,6 +110,13 @@ export default {
   position: relative;
   flex-direction: column;
   display: table;
+  margin-left: 8px;
+}
+
+.home_container__response {
+  display: flex;
+  position: relative;
+  margin-top: 74px;
   margin-left: 8px;
 }
 </style>

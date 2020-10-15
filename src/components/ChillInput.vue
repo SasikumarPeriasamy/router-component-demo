@@ -73,7 +73,8 @@ export default {
   border: 2px solid #555;
 }
 .input__error {
-  background-color: rgb(248, 148, 148);
+  border: 2px solid rgb(253, 84, 84) !important;
+  background-color: rgb(253, 166, 166);
 }
 .input__label {
   font-size: 15px;
