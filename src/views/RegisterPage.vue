@@ -7,7 +7,7 @@
       >Back</router-link
     >
   </div>
-  <div>
+  <div v-if="data.toRegister">
     <span><h5>Kindly fill the below details and click "Submit"</h5></span>
     <div class="register__content" v-if="data.userNotExist">
       <form id="register__form" @submit.prevent>
@@ -31,7 +31,7 @@
           label="Gender"
         />
         <chill-input
-          type="text"
+          type="number"
           @value="data.age = $event"
           hint=""
           label="Age"
@@ -44,7 +44,7 @@
           label="Address"
         />
         <chill-input
-          type="text"
+          type="number"
           @value="data.mob = $event"
           :isError="data.errorMob"
           hint="should be 10 digit"
@@ -59,6 +59,11 @@
       </form>
     </div>
     <div class="msg__registered" v-else></div>
+  </div>
+  <div v-else>
+    <span id="app_title"
+      ><h5>{{ ">Already Registered." }}</h5></span
+    >
   </div>
 </template>
 
@@ -79,6 +84,7 @@ export default {
     const store = useStore();
     const user = route.params.user;
     let datas = [];
+    let toRegister = true;
     const data = reactive({
       user,
       firstName: "",
@@ -91,7 +97,15 @@ export default {
       errorGender: false,
       errorAddress: false,
       errorMob: false,
+      toRegister,
     });
+
+    const userdata = store.state.userDetails.filter(
+      (users) => users.userName === user
+    );
+    if (userdata.length !== 0) {
+      data.toRegister = !userdata[0].registered;
+    }
 
     function submit() {
       let error = false;
@@ -190,5 +204,11 @@ export default {
 #register__form {
   margin: auto;
   width: 50%;
+}
+
+#app_title {
+  float: left;
+  display: flex;
+  margin-left: 8px;
 }
 </style>
