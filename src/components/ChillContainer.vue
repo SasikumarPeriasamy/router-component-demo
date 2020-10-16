@@ -17,7 +17,7 @@
       @click="emitClickEvent(title)"
     >
       <span id="container__title__large">{{ title }}</span>
-      <span id="container__timer">{{ prefix + time }}</span>
+      <span id="container__timer" v-if="timer !== 0">{{ prefix + time }}</span>
     </div>
   </div>
 </template>
@@ -37,6 +37,7 @@ export default {
     timer: {
       type: Number,
       required: false,
+      default: 0,
     },
   },
   data: () => ({
@@ -45,7 +46,7 @@ export default {
   }),
   mounted() {
     let minute = Number(this.timer) - 1;
-    let sec = 10;
+    let sec = 15;
     this.time =
       (String(minute).length === 1 ? "0" + minute : minute) +
       ":" +
@@ -136,7 +137,7 @@ export default {
 #chill__container__large {
   border: 0.2px solid rgb(247, 244, 244);
   width: 700px;
-  height: 60px;
+  min-height: 60px;
   margin: 8px 8px 8px 0px;
   background: white;
   display: flex;
@@ -162,6 +163,7 @@ export default {
   margin-top: 16px;
   margin-left: 8px;
   font-size: 14px;
+  font-weight: 600;
 }
 
 #container__timer {

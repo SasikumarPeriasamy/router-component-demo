@@ -41,9 +41,13 @@ export default {
       type: String,
       default: "",
     },
+    value: {
+      type: String,
+      required: false,
+    },
   },
-  data: () => ({
-    userValue: "",
+  data: (props) => ({
+    userValue: props.value ? props.value : "",
   }),
   watch: {
     userValue(newVal, oldVal) {

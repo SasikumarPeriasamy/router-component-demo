@@ -31,8 +31,14 @@
     ></chill-container>
   </div>
   <div class="home_container__response">
-    <div v-if="data.selectedContainer === 3">
-      <span>Check</span>
+    <div v-if="data.selectedContainer === 3 && data.isJokeReady">
+      <chill-container size="L" :title="data.joke"></chill-container>
+    </div>
+    <div v-else-if="data.selectedContainer === 2">
+      <chill-container size="S" :title="data.luckyNo"></chill-container>
+    </div>
+    <div v-else-if="data.selectedContainer === 0">
+      <chill-container size="S" :title="data.translate"></chill-container>
     </div>
   </div>
 </template>
@@ -53,7 +59,7 @@ export default {
     const store = useStore();
     const user = route.params.user;
     const userName = "";
-    const selectedContainer = 0;
+    const selectedContainer = "";
     const tiles = [
       { id: 0, title: "Translate" },
       { id: 1, title: "Meaning" },
@@ -63,12 +69,59 @@ export default {
     const data = reactive({
       user,
       userName: userName,
+      firstName: "",
+      lastName: "",
       tiles: tiles,
       selectedContainer,
       userRegister: false,
+      joke: "",
+      isJokeReady: false,
+      luckyNo: "",
+      isLucky: false,
+      notTranslated: true,
+      translate: "",
     });
 
     function routeToPage(title) {
+      if (title === "Frequent Jokes") {
+        fetch(
+          "https://api.icndb.com/jokes/random?" +
+            "firstName=" +
+            data.firstName +
+            "&lastName=" +
+            data.lastName
+        )
+          .then((res) => {
+            return res.json();
+          })
+          .then((resp) => {
+            data.isJokeReady = true;
+            data.joke = resp.value.joke;
+          });
+      }
+      switch (title) {
+        case "Lucky Number": {
+          if (!data.isLucky) {
+            const randomNo = Math.floor(Math.random() * 10 + 1);
+            data.luckyNo = randomNo;
+          }
+          data.isLucky = true;
+          break;
+        }
+        case "Translate": {
+          if (data.notTranslated) {
+            fetch(
+              "https://api.funtranslations.com/translate/braille.json" +
+                "?text=" +
+                data.userName
+            )
+              .then((response) => response.json())
+              .then((res) => (data.translate = res.contents.translated));
+            data.notTranslated = false;
+          }
+          break;
+        }
+      }
       data.selectedContainer = tiles
         .filter((tile) => tile.title === title)
         .map((tile) => tile.id)[0];
@@ -83,6 +136,8 @@ export default {
       if (userDetails.length !== 0) {
         data.userName =
           userDetails[0].firstName + " " + userDetails[0].lastName;
+        data.firstName = userDetails[0].firstName;
+        data.lastName = userDetails[0].lastName;
         data.userRegister = true;
       } else {
         const initialletter = user.charAt(0).toUpperCase();

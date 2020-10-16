@@ -38,11 +38,34 @@
         />
         <chill-input
           type="text"
-          @value="data.address = $event"
-          :isError="data.errorAddress"
-          hint="Plot no, city, state, pincode."
+          @value="data.plno = $event"
+          :isError="data.errorPlno"
+          hint="Plot no"
           label="Address"
         />
+        <div class="register__address">
+          <chill-input
+            class="margin__address"
+            type="text"
+            @value="data.city = $event"
+            :isError="data.errorCity"
+            hint="City"
+          />
+          <chill-input
+            class="margin__address"
+            type="text"
+            @value="data.state = $event"
+            :isError="data.errorState"
+            hint="State"
+          />
+          <chill-input
+            class="margin__address"
+            type="text"
+            @value="data.pincode = $event"
+            :isError="data.errorCode"
+            hint="Pincode"
+          />
+        </div>
         <chill-input
           type="number"
           @value="data.mob = $event"
@@ -60,9 +83,14 @@
     </div>
     <div class="msg__registered" v-else></div>
   </div>
+  <div v-else-if="data.submitted">
+    <span id="app_title"
+      ><h5>{{ "Your application is pending. Please be patient..." }}</h5></span
+    >
+  </div>
   <div v-else>
     <span id="app_title"
-      ><h5>{{ ">Already Registered." }}</h5></span
+      ><h5>{{ "Already registered. Thank you..." }}</h5></span
     >
   </div>
 </template>
@@ -83,7 +111,6 @@ export default {
     const route = useRoute();
     const store = useStore();
     const user = route.params.user;
-    let datas = [];
     let toRegister = true;
     const data = reactive({
       user,
@@ -91,20 +118,31 @@ export default {
       lastName: "",
       gender: "",
       age: "",
-      address: "",
+      plno: "",
+      city: "",
+      state: "",
+      pincode: "",
       mob: "",
       userNotExist: true,
       errorGender: false,
-      errorAddress: false,
+      errorPlno: false,
+      errorCity: false,
+      errorState: false,
+      errorCode: false,
       errorMob: false,
       toRegister,
+      submitted: false,
     });
 
     const userdata = store.state.userDetails.filter(
       (users) => users.userName === user
     );
     if (userdata.length !== 0) {
-      data.toRegister = !userdata[0].registered;
+      data.toRegister =
+        !userdata[0].registered &&
+        !userdata[0].updated &&
+        !store.state.submitStatus;
+      data.submitted = store.state.submitStatus && !userdata[0].registered;
     }
 
     function submit() {
@@ -124,14 +162,29 @@ export default {
       } else {
         data.errorMob = false;
       }
-      if (data.address) {
-        datas = data.address.split(",");
-        if (datas.length !== 4) {
-          data.errorAddress = true;
-          error = true;
-        } else {
-          data.errorAddress = false;
-        }
+      if (!data.plno) {
+        data.errorPlno = true;
+        error = true;
+      } else {
+        data.errorPlno = false;
+      }
+      if (!data.city) {
+        data.errorCity = true;
+        error = true;
+      } else {
+        data.errorCity = false;
+      }
+      if (!data.state) {
+        data.errorState = true;
+        error = true;
+      } else {
+        data.errorState = false;
+      }
+      if (!data.pincode) {
+        data.errorCode = true;
+        error = true;
+      } else {
+        data.errorCode = false;
       }
       if (!error) {
         const newUserDetail = {
@@ -141,18 +194,22 @@ export default {
           gender: data.gender,
           age: data.age,
           address: {
-            streetAddress: datas[0],
-            city: datas[1],
-            state: datas[2],
-            postalCode: datas[3],
+            streetAddress: data.plno,
+            city: data.city,
+            state: data.state,
+            postalCode: data.pincode,
           },
-          phoneNumbers: {
-            type: "home",
-            number: data.mob,
-          },
+          phoneNumbers: [
+            {
+              type: "home",
+              number: data.mob,
+            },
+          ],
           registered: false,
+          updated: false,
         };
         store.dispatch("addUserDetail", newUserDetail);
+        store.dispatch("submitted");
         router.push("/submitted/" + data.user);
       }
     }
@@ -210,5 +267,14 @@ export default {
   float: left;
   display: flex;
   margin-left: 8px;
+}
+
+.register__address {
+  margin: auto;
+  width: 84%;
+}
+
+.margin__address {
+  margin-top: -8px !important;
 }
 </style>

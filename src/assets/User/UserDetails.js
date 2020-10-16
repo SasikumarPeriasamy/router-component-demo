@@ -13,6 +13,7 @@ const userList = [
     },
     phoneNumbers: [{ type: "home", number: "8124635978" }],
     registered: true,
+    updated: false,
   },
   {
     userName: "sasikum",
@@ -28,6 +29,7 @@ const userList = [
     },
     phoneNumbers: [{ type: "home", number: "7383627627" }],
     registered: true,
+    updated: false,
   },
   {
     userName: "rizwan",
@@ -43,6 +45,7 @@ const userList = [
     },
     phoneNumbers: [{ type: "home", number: "7383627641" }],
     registered: true,
+    updated: false,
   },
 ];
 

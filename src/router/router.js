@@ -28,12 +28,12 @@ const routes = [
     component: SubmittedPage,
   },
   {
-    path: "/edit/:editId",
+    path: "/edit/:user",
     name: "Edit",
     component: EditPage,
   },
   {
-    path: "/about",
+    path: "/about/:user",
     name: "About",
     component: AboutPage,
   },

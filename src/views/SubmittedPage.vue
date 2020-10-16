@@ -58,7 +58,7 @@ export default {
     onMounted(() => {
       data.userName = initialletter + user.slice(1, user.length);
       const users = store.state.userDetails;
-      const sdata = users.filter((user) => !user.registered);
+      const sdata = users.filter((user) => !user.registered || user.updated);
       if (sdata.length !== 0) {
         data.display = sdata[0].firstName + " " + sdata[0].lastName;
       } else {
