@@ -61,7 +61,7 @@ export default {
     const userName = "";
     const selectedContainer = "";
     const tiles = [
-      { id: 0, title: "Translate" },
+      { id: 0, title: "Braile Translate" },
       { id: 1, title: "Meaning" },
       { id: 2, title: "Lucky Number" },
       { id: 3, title: "Frequent Jokes" },
@@ -108,7 +108,7 @@ export default {
           data.isLucky = true;
           break;
         }
-        case "Translate": {
+        case "Braile Translate": {
           if (data.notTranslated) {
             fetch(
               "https://api.funtranslations.com/translate/braille.json" +

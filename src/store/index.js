@@ -23,10 +23,14 @@ export default createStore({
       state.submitStatus = false;
     },
     UPDATE_DETAIL(state, updateDetail) {
-      const oldUser = state.userDetails.filter(
-        (user) => user.userName === updateDetail.userName
-      )[0];
-      state.userDetails.pop(oldUser);
+      for (let index = 0; index < state.userDetails.length; index++) {
+        if (
+          String(state.userDetails[index].userName).toLowerCase() ===
+          String(updateDetail.userName).toLowerCase()
+        ) {
+          state.userDetails.splice(index, 1);
+        }
+      }
       state.userDetails.push(updateDetail);
     },
     SUBMITTED(state) {

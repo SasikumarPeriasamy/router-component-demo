@@ -85,7 +85,7 @@
         <chill-button
           type="button"
           @on-click="update"
-          :disabled="toDisable"
+          :disabled="data.isEdite"
           label="Update"
         ></chill-button>
       </form>

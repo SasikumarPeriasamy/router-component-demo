@@ -35,6 +35,7 @@ export default {
       router.push("/" + loginSuccess);
     },
     onButtonClick() {
+      router.push("/");
       this.loginStatus = true;
     },
   },
