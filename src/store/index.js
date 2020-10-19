@@ -3,11 +3,20 @@ import userDetails from "./../assets/User/UserDetails";
 
 export default createStore({
   state: {
+    isLoggedIn: false,
     user: "DemoUser",
     userDetails: userDetails,
     submitStatus: false,
+    submitTimer: false,
+    time: "",
   },
   mutations: {
+    LOGGED(state) {
+      state.isLoggedIn = true;
+    },
+    LOGOUT(state) {
+      state.isLoggedIn = false;
+    },
     SET_USER(state, userName) {
       state.user = userName;
     },
@@ -36,8 +45,22 @@ export default createStore({
     SUBMITTED(state) {
       state.submitStatus = true;
     },
+    TIMER(state, time) {
+      state.submitTimer = true;
+      state.time = time;
+    },
+    RESET(state) {
+      state.submitTimer = false;
+      state.time = "";
+    },
   },
   actions: {
+    logged({ commit }) {
+      commit("LOGGED");
+    },
+    logout({ commit }) {
+      commit("LOGOUT");
+    },
     setUser({ commit }, newUser) {
       commit("SET_USER", newUser);
     },
@@ -52,6 +75,12 @@ export default createStore({
     },
     submitted({ commit }) {
       commit("SUBMITTED");
+    },
+    timer({ commit }, time) {
+      commit("TIMER", time);
+    },
+    reset({ commit }) {
+      commit("RESET");
     },
   },
   modules: {},

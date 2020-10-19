@@ -29,6 +29,7 @@
 <script>
 import ChillInput from "./ChillInput.vue";
 import ChillButton from "./ChillButton.vue";
+import { useStore } from "vuex";
 export default {
   name: "Login",
   props: {
@@ -44,10 +45,12 @@ export default {
     errorUsr: false,
     errorPwd: false,
     toDisable: false,
+    store: useStore(),
   }),
   methods: {
     onButtonClick() {
       if (this.username && this.password) {
+        this.store.dispatch("logged");
         this.$emit("login-status", this.username);
       } else {
         this.errorUsr = !this.username;

@@ -13,30 +13,53 @@
       <router-view />
     </div>
   </div>
+  <div v-if="timeout">
+    <chill-toster msg="logout"></chill-toster>
+  </div>
 </template>
 
 <script>
 import Login from "./components/Login.vue";
 import ChillButton from "./components/ChillButton.vue";
+import ChillToster from "./components/ChillToster.vue";
 import router from "./router/router";
+import { useStore } from "vuex";
 
 export default {
   name: "App",
   components: {
     Login,
     ChillButton,
+    ChillToster,
   },
   data: () => ({
-    loginStatus: true,
+    loginStatus: null,
+    store: useStore(),
+    timeout: false,
+    timer: 100,
   }),
+  mounted() {
+    this.loginStatus =
+      !this.store.state.isLoggedIn &&
+      String(window.location.href).slice(21) === "/";
+
+    const time = setInterval(() => {
+      this.timer--;
+      if (this.timer === 0) {
+        this.timeout = true;
+        clearInterval(time);
+      }
+    }, 1000);
+  },
   methods: {
     checkLoginStatus(loginSuccess) {
-      this.loginStatus = false;
+      this.loginStatus = !this.store.state.isLoggedIn;
       router.push("/" + loginSuccess);
     },
     onButtonClick() {
       router.push("/");
       this.loginStatus = true;
+      this.store.dispatch("logout");
     },
   },
 };

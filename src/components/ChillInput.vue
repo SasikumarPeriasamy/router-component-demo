@@ -84,9 +84,10 @@ export default {
   font-size: 15px;
   zoom: 1;
   padding-top: 10px;
-  width: 75px;
+  width: 76px;
   display: inline-block;
   padding-left: 8px;
+  font-weight: bold;
 }
 
 .chill_input__margin {

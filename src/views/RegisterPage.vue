@@ -23,13 +23,14 @@
           hint="Last name"
           label="Last Name"
         />
-        <chill-input
-          type="text"
-          @value="data.gender = $event"
-          :isError="data.errorGender"
-          hint="male or female"
+        <chill-radio
+          :items="data.radio"
           label="Gender"
-        />
+          @on-click="
+            data.gender = data.radio.filter((val) => val.id === $event)[0].value
+          "
+        >
+        </chill-radio>
         <chill-input
           type="number"
           @value="data.age = $event"
@@ -100,12 +101,14 @@ import { reactive } from "vue";
 import { useRoute } from "vue-router";
 import ChillInput from "./../components/ChillInput";
 import ChillButton from "./../components/ChillButton";
+import ChillRadio from "./../components/ChillRadio";
 import router from "./../router/router";
 import { useStore } from "vuex";
 export default {
   components: {
     ChillInput,
     ChillButton,
+    ChillRadio,
   },
   setup() {
     const route = useRoute();
@@ -123,6 +126,10 @@ export default {
       state: "",
       pincode: "",
       mob: "",
+      radio: [
+        { id: 1, value: "Male" },
+        { id: 2, value: "Female" },
+      ],
       userNotExist: true,
       errorGender: false,
       errorPlno: false,
@@ -148,9 +155,6 @@ export default {
     function submit() {
       let error = false;
       if (!data.gender) {
-        data.errorGender = true;
-        error = true;
-      } else if ((data.gender !== "male") | "female") {
         data.errorGender = true;
         error = true;
       } else {

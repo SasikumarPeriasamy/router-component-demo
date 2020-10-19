@@ -25,14 +25,15 @@
           label="Last Name"
           :value="data.lastName"
         />
-        <chill-input
-          type="text"
-          @value="data.gender = $event"
-          :isError="data.errorGender"
-          hint="male or female"
+        <chill-radio
+          :items="data.radio"
           label="Gender"
-          :value="data.gender"
-        />
+          @on-click="
+            data.gender = data.radio.filter((val) => val.id === $event)[0].value
+          "
+          :default="data.gender"
+        >
+        </chill-radio>
         <chill-input
           type="number"
           @value="data.age = $event"
@@ -108,6 +109,7 @@ import { reactive } from "vue";
 import { useRoute } from "vue-router";
 import ChillInput from "./../components/ChillInput";
 import ChillButton from "./../components/ChillButton";
+import ChillRadio from "./../components/ChillRadio";
 import { useStore } from "vuex";
 import router from "./../router/router";
 
@@ -115,6 +117,7 @@ export default {
   components: {
     ChillInput,
     ChillButton,
+    ChillRadio,
   },
   setup() {
     const route = useRoute();
@@ -131,6 +134,10 @@ export default {
       state: "",
       pincode: "",
       mob: "",
+      radio: [
+        { id: 1, value: "Male" },
+        { id: 2, value: "Female" },
+      ],
       userNotExist: true,
       errorGender: false,
       errorPlno: false,
@@ -153,7 +160,9 @@ export default {
       data.submitted = store.state.submitStatus && userdata[0].registered;
       data.firstName = userdata[0].firstName;
       data.lastName = userdata[0].lastName;
-      data.gender = userdata[0].gender;
+      data.gender = data.radio.filter(
+        (val) => val.value === userdata[0].gender
+      )[0].id;
       data.age = userdata[0].age;
       data.plno = userdata[0].address.streetAddress;
       data.city = userdata[0].address.city;
@@ -165,9 +174,6 @@ export default {
     function update() {
       let error = false;
       if (!data.gender) {
-        data.errorGender = true;
-        error = true;
-      } else if ((data.gender !== "male") | "female") {
         data.errorGender = true;
         error = true;
       } else {

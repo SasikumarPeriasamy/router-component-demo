@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import { useStore } from "vuex";
 export default {
   name: "chill-container",
   props: {
@@ -35,9 +36,9 @@ export default {
       required: true,
     },
     timer: {
-      type: Number,
+      type: String,
       required: false,
-      default: 0,
+      default: "0",
     },
   },
   data: () => ({
@@ -45,29 +46,51 @@ export default {
     prefix: "Auto approve in: ",
   }),
   mounted() {
-    let minute = Number(this.timer) - 1;
-    let sec = 15;
-    this.time =
-      (String(minute).length === 1 ? "0" + minute : minute) +
-      ":" +
-      (String(sec).length === 1 ? "0" + sec : sec);
-    const timers = setInterval(() => {
-      sec--;
+    const store = useStore();
+    if (
+      !store.state.submitTimer &&
+      store.state.submitStatus &&
+      this.timer &&
+      this.timer !== "0"
+    ) {
+      let minute = Number(this.timer) - 1;
+      let sec = 15;
       this.time =
         (String(minute).length === 1 ? "0" + minute : minute) +
         ":" +
         (String(sec).length === 1 ? "0" + sec : sec);
-      if (sec === 0 && minute !== 0) {
-        minute--;
-        sec = 59;
-      }
-      if (minute === 0 && sec === 0) {
-        this.time = "Approved";
-        this.prefix = "";
-        clearInterval(timers);
-        this.$emit("approved");
-      }
-    }, 1000);
+      const timers = setInterval(() => {
+        sec--;
+        this.time =
+          (String(minute).length === 1 ? "0" + minute : minute) +
+          ":" +
+          (String(sec).length === 1 ? "0" + sec : sec);
+        console.log(this.time);
+        store.dispatch("timer", this.time);
+        if (sec === 0 && minute !== 0) {
+          minute--;
+          sec = 59;
+        }
+        if (minute === 0 && sec === 0) {
+          this.time = "Approved";
+          this.prefix = "";
+          store.dispatch("reset");
+          clearInterval(timers);
+          this.$emit("approved");
+        }
+      }, 1000);
+    } else {
+      const loadTimer = setInterval(() => {
+        if (store.state.time !== "") {
+          this.time = store.state.time;
+        } else {
+          this.time = "Approved";
+          this.prefix = "";
+          clearInterval(loadTimer);
+          this.$emit("approved");
+        }
+      }, 1);
+    }
   },
   methods: {
     emitClickEvent(title) {
